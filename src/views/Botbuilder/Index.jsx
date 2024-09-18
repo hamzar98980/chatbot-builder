@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { toggleCollapsedNav } from '../../redux/action/Theme';
 import '@xyflow/react/dist/style.css';
-import { Disc, X, MessageCircle, Image } from 'react-feather';
+import { Disc, X, MessageCircle, Image, Headphones, Phone, Calendar } from 'react-feather';
 import { Button, Card, Col, Row, Offcanvas } from 'react-bootstrap';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
@@ -22,6 +22,7 @@ import {
     Handle,
     Position
 } from '@xyflow/react';
+import { Pointer } from 'tabler-icons-react';
 
 
 const initialNodes = [
@@ -121,7 +122,7 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
         return code.toString();
     }
 
-    const addComponentToNode = ({ label, id, type }) => {
+    const addComponentToNode = ({ label, id, type, message }) => {
         setCards((prevCards) => {
             const nodeCards = prevCards[selectedNode] || []; // Get existing components for the selected node
             let prevMessage = '';
@@ -131,9 +132,12 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
             const updatedCards = [...nodeCards, {
                 label, id, data: {
                     message: prevMessage,
-                    type: type
+                    type: type,
+                    mindate: '',
+                    maxdate: ''
                 },
-                uid: generateUniqueCode()
+                uid: generateUniqueCode(),
+
             }];
             return {
                 ...prevCards,
@@ -148,7 +152,7 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
             const newNodeId = (lastNodeId + 1).toString();
             const newNode = {
                 id: newNodeId,
-                position: { x: 500, y: 250 },
+                position: { x: 1200, y: 500 },
                 data: { label: `Node ${newNodeId}` },
                 type: 'custom'
             };
@@ -219,32 +223,44 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
 
                                         styling = { display: 'flex', alignItems: "start" };
                                     }
+                                    let componentMessage = val.data.message;
 
                                     // return <div key={ind}>{val}</div>;  // Render each card component
-                                    return <Card key={ind} className="mt-3" style={{ backgroundColor: '#f5f5f5' }}>
+                                    return <Card key={ind} className="mt-3" style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7' }}>
                                         <Card.Body onClick={() => {
-                                            console.log('ho ra h');
 
                                             setLgShow(!lgShow)
                                             setSelectedComponentID(val.uid)
                                             setNodeIdComponent(id)
 
+
                                         }}>
                                             <div style={styling} className='gap-2'>
-                                                <span className="feather-icon mt-1" style={{ fontSize: 20, color: '#007D88' }}>
+                                                <span className="feather-icon mt-1" style={{ fontSize: 18, color: '#007D88' }}>
                                                     {
                                                         val.data.type == 'text' ? (<MessageCircle />) :
-                                                            val.data.type == 'file' ? (<Image />) : ''
+                                                            val.data.type == 'file' ? (<Image />) :
+                                                                val.data.type == 'audio' ? (<Headphones />) :
+                                                                    val.data.type == 'date' ? (<Calendar />) :
+                                                                        ''
                                                     }
                                                 </span>
 
                                                 {
-                                                    val.data.type == 'text' ? (<div dangerouslySetInnerHTML={{ __html: val.data.message }} />) :
-                                                        val.data.type == 'file' ? (
+                                                    val.data.type == 'text' ? (<div dangerouslySetInnerHTML={{ __html: componentMessage ?? 'Click To Edit' }} />)
+                                                        : val.data.type == 'file' ? (
                                                             <div>
                                                                 <img style={{ height: 150, width: 240, borderRadius: 10 }} className="preview-image" src={val.data.message} alt="brand" />
                                                             </div>
-                                                            // <div dangerouslySetInnerHTML={{ __html: val.data.message }} />
+                                                        ) : val.data.type == 'audio' ? (
+                                                            <>
+                                                                <audio controls>
+                                                                    <source src={componentMessage} type="audio/ogg" />
+                                                                </audio>
+                                                            </>
+                                                        ) : val.data.type == 'date' ? (
+                                                            componentMessage != null && componentMessage != '' ? (<>{componentMessage}</>) : (<>{'Pick a date'}</>)
+
                                                         ) : ''
                                                 }
 
@@ -355,8 +371,9 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
                 </Offcanvas.Header>
                 <Offcanvas.Body>
                     <Row>
+                        <h6><b>Bubbles</b></h6>
                         <Col sm={6}>
-                            <Card className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'Text', id: 1, type: 'text', message: null })}>
+                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'Text', id: 1, type: 'text', message: null })}>
                                 <div className={classNames("refresh-container", { "la-animate": refreshCard })}>
                                     <div className="loader-pendulums" />
                                 </div>
@@ -375,7 +392,7 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
                             </Card>
                         </Col>
                         <Col sm={6}>
-                            <Card className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'Text', id: 2, type: 'file', message: null })}>
+                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'Text', id: 2, type: 'file', message: null })}>
                                 <div className={classNames("refresh-container", { "la-animate": refreshCard })}>
                                     <div className="loader-pendulums" />
                                 </div>
@@ -393,6 +410,47 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
                                 </Card.Header>
                             </Card>
                         </Col>
+                        <Col sm={6}>
+                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'audio', id: 3, type: 'audio', message: null })}>
+                                <div className={classNames("refresh-container", { "la-animate": refreshCard })}>
+                                    <div className="loader-pendulums" />
+                                </div>
+                                <Card.Header className="card-header-action">
+                                    <h6>Audio</h6>
+                                    <div className="card-action-wrap">
+                                        <a href="javascript:;" className="btn btn-xs btn-icon btn-rounded btn-flush-dark flush-soft-hover card-close">
+                                            <span className="icon" >
+                                                <span className="feather-icon" style={{ fontSize: 20 }}>
+                                                    <Headphones />
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                </Card.Header>
+                            </Card>
+                        </Col>
+                    </Row>
+                    <Row className='mt-3'>
+                        <h6><b>Inputs</b></h6>
+                        <Col sm={6}>
+                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'calendar', id: 4, type: 'date', message: null })}>
+                                <div className={classNames("refresh-container", { "la-animate": refreshCard })}>
+                                    <div className="loader-pendulums" />
+                                </div>
+                                <Card.Header className="card-header-action">
+                                    <h6>Date</h6>
+                                    <div className="card-action-wrap">
+                                        <a href="javascript:;" className="btn btn-xs btn-icon btn-rounded btn-flush-dark flush-soft-hover card-close">
+                                            <span className="icon" >
+                                                <span className="feather-icon" style={{ fontSize: 20 }}>
+                                                    <Calendar />
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                </Card.Header>
+                            </Card>
+                        </Col>
                     </Row>
                 </Offcanvas.Body>
             </Offcanvas>
@@ -400,9 +458,6 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
             <Row>
                 <Col sm={3} style={{ padding: 10, marginLeft: 15 }}>
                     <Button style={{ marginRight: 10 }} onClick={() => {
-                        console.log(nodes, 'nodes');
-                        console.log(edges, 'edges');
-                        console.log(cards, 'cards');
 
                         let alingedNodesObj = alignNodes(nodes, edges);
                         let nodesWithCards = addCardData(alingedNodesObj);

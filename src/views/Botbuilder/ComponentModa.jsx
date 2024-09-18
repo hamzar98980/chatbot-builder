@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Button, Form, Modal } from 'react-bootstrap';
+import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
 
 const ComponentModal = ({ lgShow, setLgShow, nodeIdComponent, selectedComponentID, cards, setCards }) => {
     const [componentType, setComponentType] = useState(null);
     const [componentMessage, setComponentMessage] = useState('');
     const [selectedIndex, setSelectedIndex] = useState(null);
-
-
+    const [minDate, setMinDate] = useState('');
+    const [maxDate, setMaxDate] = useState('');
 
     useEffect(() => {
         if (cards[nodeIdComponent] && Array.isArray(cards[nodeIdComponent])) {
@@ -15,6 +15,8 @@ const ComponentModal = ({ lgShow, setLgShow, nodeIdComponent, selectedComponentI
                 const result = cards[nodeIdComponent][index];
                 setComponentType(result.data.type);
                 setComponentMessage(result.data.message)
+                setMinDate(result.data.mindate)
+                setMaxDate(result.data.maxdate)
                 setSelectedIndex(index);
             } else {
                 console.log('No matching object found');
@@ -31,7 +33,9 @@ const ComponentModal = ({ lgShow, setLgShow, nodeIdComponent, selectedComponentI
                 ...updatedComponents[selectedIndex],
                 data: {
                     ...updatedComponents[selectedIndex].data,
-                    message: componentMessage
+                    message: componentMessage,
+                    mindate: minDate,
+                    maxdate: maxDate
                 }
             };
             updatedComponents[selectedIndex] = updatedComponent;
@@ -85,7 +89,45 @@ const ComponentModal = ({ lgShow, setLgShow, nodeIdComponent, selectedComponentI
                             </Form.Group>
                             <img style={{ height: 150, width: 240, borderRadius: 10 }} className="preview-image" src={componentMessage} alt="brand" />
                         </>
-                    ) : (<div></div>)
+                    ) : componentType == 'audio' ? (
+                        <>
+                            <Form.Group controlId="formFile" className="mb-3">
+                                <Form.Label>Select File</Form.Label>
+                                <Form.Control type="file" onChange={handleFileChange} />
+                            </Form.Group>
+                            {componentMessage && (
+                                <audio controls src={componentMessage} style={{ width: '100%' }}>
+                                    Your browser does not support the audio element.
+                                </audio>
+                            )}
+                        </>
+                    ) : componentType == 'date' ? (
+                        <>
+                            <Row>
+                                <Col sm={4}>
+                                    <Form.Group controlId="" className="mb-3">
+                                        <Form.Label>Min:</Form.Label>
+                                        <Form.Control type="date" value={minDate} onChange={(e) => setMinDate(e.target.value)} />
+                                    </Form.Group>
+                                </Col>
+                                <Col sm={4}>
+                                    <Form.Group controlId="" className="mb-3">
+                                        <Form.Label>Max:</Form.Label>
+                                        <Form.Control type="date" value={maxDate} onChange={(e) => setMaxDate(e.target.value)} />
+                                    </Form.Group>
+                                </Col>
+                                <Col sm={4}>
+                                    <Form.Group controlId="" className="mb-3">
+                                        <Form.Label>Formate</Form.Label>
+                                        <Form.Control type="text" value={componentMessage} onChange={(e) => setComponentMessage(e.target.value)} placeholder="dd/MM/YYYY" />
+                                    </Form.Group>
+                                </Col>
+
+                            </Row>
+
+                        </>
+                    ) :
+                        (<div></div>)
                 }
 
             </Modal.Body>
