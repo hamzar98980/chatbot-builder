@@ -23,6 +23,7 @@ import {
     Position
 } from '@xyflow/react';
 import { Pointer } from 'tabler-icons-react';
+import axios from 'axios';
 
 
 const initialNodes = [
@@ -392,7 +393,7 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
                             </Card>
                         </Col>
                         <Col sm={6}>
-                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'Text', id: 2, type: 'file', message: null })}>
+                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'File', id: 2, type: 'file', message: null })}>
                                 <div className={classNames("refresh-container", { "la-animate": refreshCard })}>
                                     <div className="loader-pendulums" />
                                 </div>
@@ -462,6 +463,8 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
                         let alingedNodesObj = alignNodes(nodes, edges);
                         let nodesWithCards = addCardData(alingedNodesObj);
                         console.log(nodesWithCards);
+                        let chatbotBuilder = axios.post('https://gar-full-admittedly.ngrok-free.app/chatbot/builder', nodesWithCards);
+                        console.log(chatbotBuilder);
 
                     }}>Update Bot</Button>
 
