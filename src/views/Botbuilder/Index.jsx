@@ -123,7 +123,7 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
         return code.toString();
     }
 
-    const addComponentToNode = ({ label, id, type, message }) => {
+    const addComponentToNode = ({ label, id, type, message, component_category }) => {
         setCards((prevCards) => {
             const nodeCards = prevCards[selectedNode] || []; // Get existing components for the selected node
             let prevMessage = '';
@@ -138,6 +138,7 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
                     maxdate: ''
                 },
                 uid: generateUniqueCode(),
+                component_category,
 
             }];
             return {
@@ -374,7 +375,7 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
                     <Row>
                         <h6><b>Bubbles</b></h6>
                         <Col sm={6}>
-                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'Text', id: 1, type: 'text', message: null })}>
+                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'Text', id: 1, type: 'text', message: null, component_category: "Bubbles" })}>
                                 <div className={classNames("refresh-container", { "la-animate": refreshCard })}>
                                     <div className="loader-pendulums" />
                                 </div>
@@ -393,7 +394,7 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
                             </Card>
                         </Col>
                         <Col sm={6}>
-                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'File', id: 2, type: 'file', message: null })}>
+                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'File', id: 2, type: 'file', message: null, component_category: "Bubbles" })}>
                                 <div className={classNames("refresh-container", { "la-animate": refreshCard })}>
                                     <div className="loader-pendulums" />
                                 </div>
@@ -412,7 +413,7 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
                             </Card>
                         </Col>
                         <Col sm={6}>
-                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'audio', id: 3, type: 'audio', message: null })}>
+                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'audio', id: 3, type: 'audio', message: null, component_category: "Bubbles" })}>
                                 <div className={classNames("refresh-container", { "la-animate": refreshCard })}>
                                     <div className="loader-pendulums" />
                                 </div>
@@ -434,7 +435,7 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
                     <Row className='mt-3'>
                         <h6><b>Inputs</b></h6>
                         <Col sm={6}>
-                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'calendar', id: 4, type: 'date', message: null })}>
+                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'calendar', id: 4, type: 'date', message: null, component_category: "Inputs" })}>
                                 <div className={classNames("refresh-container", { "la-animate": refreshCard })}>
                                     <div className="loader-pendulums" />
                                 </div>
@@ -463,7 +464,7 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
                         let alingedNodesObj = alignNodes(nodes, edges);
                         let nodesWithCards = addCardData(alingedNodesObj);
                         console.log(nodesWithCards);
-                        let chatbotBuilder = axios.post('https://gar-full-admittedly.ngrok-free.app/chatbot/builder', nodesWithCards);
+                        let chatbotBuilder = axios.post('https://demo-laravel-proj.test/api/create-chatbot', nodesWithCards);
                         console.log(chatbotBuilder);
 
                     }}>Update Bot</Button>

@@ -78,7 +78,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "proxy": "http://localhost:3002"
+    "proxy": "https://demo-laravel-proj.test"
   },
   "eslintConfig": {
     "extends": [
