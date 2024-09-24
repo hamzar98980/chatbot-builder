@@ -7,17 +7,24 @@ const ComponentModal = ({ lgShow, setLgShow, nodeIdComponent, selectedComponentI
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [minDate, setMinDate] = useState('');
     const [maxDate, setMaxDate] = useState('');
+    const [minnumber, setMinnumber] = useState(null);
+    const [maxnumber, setMaxnumber] = useState(null);
+    const [phoneCountryCode, setPhoneCountryCode] = useState(null);
 
     useEffect(() => {
         if (cards[nodeIdComponent] && Array.isArray(cards[nodeIdComponent])) {
             const index = cards[nodeIdComponent].findIndex(item => item.uid === selectedComponentID);
             if (index !== -1) {
                 const result = cards[nodeIdComponent][index];
+
                 setComponentType(result.data.type);
                 setComponentMessage(result.data.message)
                 setMinDate(result.data.mindate)
                 setMaxDate(result.data.maxdate)
                 setSelectedIndex(index);
+                setMinnumber(result.data.minnumber);
+                setMaxnumber(result.data.maxnumber);
+                setPhoneCountryCode(result.data.phonecountry_code);
             } else {
                 console.log('No matching object found');
             }
@@ -35,7 +42,10 @@ const ComponentModal = ({ lgShow, setLgShow, nodeIdComponent, selectedComponentI
                     ...updatedComponents[selectedIndex].data,
                     message: componentMessage,
                     mindate: minDate,
-                    maxdate: maxDate
+                    maxdate: maxDate,
+                    minnumber: minnumber,
+                    maxnumber: maxnumber,
+                    phonecountry_code: phoneCountryCode
                 }
             };
             updatedComponents[selectedIndex] = updatedComponent;
@@ -76,7 +86,7 @@ const ComponentModal = ({ lgShow, setLgShow, nodeIdComponent, selectedComponentI
             </Modal.Header>
             <Modal.Body>
                 {
-                    componentType == 'text' ? (
+                    componentType == 'message' ? (
                         <div>
                             <label htmlFor="">Enter Message</label>
                             <input type="text" className='form-control' value={componentMessage} onChange={(e) => setComponentMessage(e.target.value)} />
@@ -126,8 +136,44 @@ const ComponentModal = ({ lgShow, setLgShow, nodeIdComponent, selectedComponentI
                             </Row>
 
                         </>
+                    ) : componentType == 'number' ? (
+                        <>
+                            <Row>
+                                <Col sm={4}>
+                                    <Form.Group controlId="" className="mb-3">
+                                        <Form.Label>Min: </Form.Label>
+                                        <Form.Control type="number" value={minnumber} onChange={(e) => setMinnumber(e.target.value)} />
+                                    </Form.Group>
+                                </Col>
+                                <Col sm={4}>
+                                    <Form.Group controlId="" className="mb-3">
+                                        <Form.Label>Max: </Form.Label>
+                                        <Form.Control type="number" value={maxnumber} onChange={(e) => setMaxnumber(e.target.value)} />
+                                    </Form.Group>
+                                </Col>
+
+                            </Row>
+
+                        </>
                     ) :
-                        (<div></div>)
+                        componentType == 'phone' ? (
+                            <>
+                                <Row>
+                                    <Col sm={6}>
+                                        <Form.Group controlId="" className="mb-3">
+                                            <Form.Label>Default country:  </Form.Label>
+                                            <Form.Select value={phoneCountryCode} defaultValue="International" onChange={(e) => setPhoneCountryCode(e.target.value)} >
+                                                <option>International</option>
+                                                <option >Pakistan (+92)</option>
+                                                <option value={'USA'}>United States Of America (+1)</option>
+                                            </Form.Select>
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+
+                            </>
+                        ) :
+                            (<div></div>)
                 }
 
             </Modal.Body>

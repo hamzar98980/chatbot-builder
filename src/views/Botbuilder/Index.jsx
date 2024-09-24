@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { toggleCollapsedNav } from '../../redux/action/Theme';
 import '@xyflow/react/dist/style.css';
-import { Disc, X, MessageCircle, Image, Headphones, Phone, Calendar } from 'react-feather';
+import { Disc, X, MessageCircle, Image, Headphones, Phone, Calendar, Voicemail, Type, Hash, Inbox, Mail, Globe } from 'react-feather';
 import { Button, Card, Col, Row, Offcanvas } from 'react-bootstrap';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
@@ -41,7 +41,6 @@ const initialEdges = [
 const BotBuilder = ({ toggleCollapsedNav }) => {
 
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-    const [openCard, setOpenCard] = useState(true);
     const [refreshCard, setRefreshCard] = useState(false);
     const [maxiMize, setMaxiMize] = useState(false);
     const [show, setShow] = useState(false);
@@ -135,7 +134,10 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
                     message: prevMessage,
                     type: type,
                     mindate: '',
-                    maxdate: ''
+                    maxdate: '',
+                    minnumber: null,
+                    maxnumber: null,
+                    phonecountry_code: null
                 },
                 uid: generateUniqueCode(),
                 component_category,
@@ -163,6 +165,18 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
     }
 
 
+    const removeNode = (id) => {
+
+        const updatedNodes = nodes.filter(node => node.id !== id);
+        setNodes(updatedNodes);
+
+        let componentsCards = cards;
+        if (componentsCards[id]) {
+            delete componentsCards[id]; // Remove the array where key matches the id
+        }
+        setCards(componentsCards);
+
+    }
 
     useEffect(() => {
         toggleCollapsedNav(false);
@@ -203,7 +217,7 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
                                     </span></span>
                                 </Link>
 
-                                <a href="#card" className="btn btn-xs btn-icon btn-rounded btn-flush-dark flush-soft-hover card-close">
+                                <a href="javascript:void(0)" onClick={() => removeNode(id)} className="btn btn-xs btn-icon btn-rounded btn-flush-dark flush-soft-hover card-close">
                                     <span className="icon"><span className="feather-icon">
                                         <X />
                                     </span></span>
@@ -217,6 +231,7 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
 
                             <div id={'node-' + id}>
                                 {cards[id] && Array.isArray(cards[id]) && cards[id].map((val, ind) => {
+                                    console.log(val, 'val');
 
                                     let styling = {};
                                     if (val.data.type == 'file') {
@@ -240,16 +255,21 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
                                             <div style={styling} className='gap-2'>
                                                 <span className="feather-icon mt-1" style={{ fontSize: 18, color: '#007D88' }}>
                                                     {
-                                                        val.data.type == 'text' ? (<MessageCircle />) :
+                                                        val.data.type == 'message' ? (<MessageCircle />) :
                                                             val.data.type == 'file' ? (<Image />) :
                                                                 val.data.type == 'audio' ? (<Headphones />) :
                                                                     val.data.type == 'date' ? (<Calendar />) :
-                                                                        ''
+                                                                        val.data.type == 'text' ? (<Type />) :
+                                                                            val.data.type == 'number' ? (<Hash />) :
+                                                                                val.data.type == 'phone' ? (<Phone />) :
+                                                                                    val.data.type == 'email' ? (<Mail />) :
+                                                                                        val.data.type == 'website' ? (<Globe />) :
+                                                                                            ''
                                                     }
                                                 </span>
 
                                                 {
-                                                    val.data.type == 'text' ? (<div dangerouslySetInnerHTML={{ __html: componentMessage ?? 'Click To Edit' }} />)
+                                                    val.data.type == 'message' ? (<div dangerouslySetInnerHTML={{ __html: componentMessage ?? 'Click To Edit' }} />)
                                                         : val.data.type == 'file' ? (
                                                             <div>
                                                                 <img style={{ height: 150, width: 240, borderRadius: 10 }} className="preview-image" src={val.data.message} alt="brand" />
@@ -263,6 +283,20 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
                                                         ) : val.data.type == 'date' ? (
                                                             componentMessage != null && componentMessage != '' ? (<>{componentMessage}</>) : (<>{'Pick a date'}</>)
 
+                                                        ) : val.data.type == 'text' ? (
+                                                            componentMessage != null && componentMessage != '' ? (<>{componentMessage}</>) : (<>{'Type Your Answer...'}</>)
+
+                                                        ) : val.data.type == 'number' ? (
+                                                            componentMessage != null && componentMessage != '' ? (<>{componentMessage}</>) : (<>{'Type A Number...'}</>)
+
+                                                        ) : val.data.type == 'phone' ? (
+                                                            componentMessage != null && componentMessage != '' ? (<>{componentMessage}</>) : (<>{'Type Your Phone Number...'}</>)
+
+                                                        ) : val.data.type == 'email' ? (
+                                                            componentMessage != null && componentMessage != '' ? (<>{componentMessage}</>) : (<>{'Type Your Email...'}</>)
+
+                                                        ) : val.data.type == 'website' ? (
+                                                            componentMessage != null && componentMessage != '' ? (<>{componentMessage}</>) : (<>{'Type Your Url...'}</>)
                                                         ) : ''
                                                 }
 
@@ -306,18 +340,20 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
         return (
             <Col lg={6} sm={12}>
                 <Card className={classNames("card-refresh", { "fullscreen": maxiMize })}>
-                    <Handle
-                        type="target"
-                        position={Position.Top}
-                        id="t"
-                        style={{
-                            background: '#555',
-                            width: 10,
-                            height: 10,
-                            borderRadius: '100%',
-                        }}
-                        isConnectable={isConnectable}
-                    />
+                    {data.label == 'End' ? (<>
+                        <Handle
+                            type="target"
+                            position={Position.Top}
+                            id="t"
+                            style={{
+                                background: '#555',
+                                width: 10,
+                                height: 10,
+                                borderRadius: '100%',
+                            }}
+                            isConnectable={isConnectable}
+                        />
+                    </>) : ''}
 
                     <div className={classNames("refresh-container", { "la-animate": refreshCard })}>
                         <div className="loader-pendulums" />
@@ -333,20 +369,22 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
                         <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
                     </div>
 
-                    <Card.Footer className="text-muted">
-                        <Handle
-                            type="source"
-                            position={Position.Bottom}
-                            id="b"
-                            style={{
-                                background: '#555',
-                                width: 10,
-                                height: 10,
-                                borderRadius: '100%',
-                            }}
-                            isConnectable={isConnectable}
-                        />
-                    </Card.Footer>
+                    {data.label == 'Start' ? (<>
+                        <Card.Footer className="text-muted">
+                            <Handle
+                                type="source"
+                                position={Position.Bottom}
+                                id="b"
+                                style={{
+                                    background: '#555',
+                                    width: 10,
+                                    height: 10,
+                                    borderRadius: '100%',
+                                }}
+                                isConnectable={isConnectable}
+                            />
+                        </Card.Footer>
+                    </>) : ''}
                 </Card>
             </Col >
         );
@@ -375,12 +413,12 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
                     <Row>
                         <h6><b>Bubbles</b></h6>
                         <Col sm={6}>
-                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'Text', id: 1, type: 'text', message: null, component_category: "Bubbles" })}>
+                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'Message', id: 1, type: 'message', message: null, component_category: "Bubbles" })}>
                                 <div className={classNames("refresh-container", { "la-animate": refreshCard })}>
                                     <div className="loader-pendulums" />
                                 </div>
                                 <Card.Header className="card-header-action">
-                                    <h6>Text</h6>
+                                    <h6>Message</h6>
                                     <div className="card-action-wrap">
                                         <a href="javascript:;" className="btn btn-xs btn-icon btn-rounded btn-flush-dark flush-soft-hover card-close">
                                             <span className="icon">
@@ -446,6 +484,101 @@ const BotBuilder = ({ toggleCollapsedNav }) => {
                                             <span className="icon" >
                                                 <span className="feather-icon" style={{ fontSize: 20 }}>
                                                     <Calendar />
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                </Card.Header>
+                            </Card>
+                        </Col>
+                        <Col sm={6}>
+                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'text', id: 5, type: 'text', message: null, component_category: "Inputs" })}>
+                                <div className={classNames("refresh-container", { "la-animate": refreshCard })}>
+                                    <div className="loader-pendulums" />
+                                </div>
+                                <Card.Header className="card-header-action">
+                                    <h6>Text</h6>
+                                    <div className="card-action-wrap">
+                                        <a href="javascript:;" className="btn btn-xs btn-icon btn-rounded btn-flush-dark flush-soft-hover card-close">
+                                            <span className="icon" >
+                                                <span className="feather-icon" style={{ fontSize: 20 }}>
+                                                    <Type />
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                </Card.Header>
+                            </Card>
+                        </Col>
+                        <Col sm={6}>
+                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'number', id: 6, type: 'number', message: null, component_category: "Inputs" })}>
+                                <div className={classNames("refresh-container", { "la-animate": refreshCard })}>
+                                    <div className="loader-pendulums" />
+                                </div>
+                                <Card.Header className="card-header-action">
+                                    <h6>Number</h6>
+                                    <div className="card-action-wrap">
+                                        <a href="javascript:;" className="btn btn-xs btn-icon btn-rounded btn-flush-dark flush-soft-hover card-close">
+                                            <span className="icon" >
+                                                <span className="feather-icon" style={{ fontSize: 20 }}>
+                                                    <Hash />
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                </Card.Header>
+                            </Card>
+                        </Col>
+                        <Col sm={6}>
+                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'phone', id: 7, type: 'phone', message: null, component_category: "Inputs" })}>
+                                <div className={classNames("refresh-container", { "la-animate": refreshCard })}>
+                                    <div className="loader-pendulums" />
+                                </div>
+                                <Card.Header className="card-header-action">
+                                    <h6>Phone</h6>
+                                    <div className="card-action-wrap">
+                                        <a href="javascript:;" className="btn btn-xs btn-icon btn-rounded btn-flush-dark flush-soft-hover card-close">
+                                            <span className="icon" >
+                                                <span className="feather-icon" style={{ fontSize: 20 }}>
+                                                    <Phone />
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                </Card.Header>
+                            </Card>
+                        </Col>
+                        <Col sm={6}>
+                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'email', id: 8, type: 'email', message: null, component_category: "Inputs" })}>
+                                <div className={classNames("refresh-container", { "la-animate": refreshCard })}>
+                                    <div className="loader-pendulums" />
+                                </div>
+                                <Card.Header className="card-header-action">
+                                    <h6>Email</h6>
+                                    <div className="card-action-wrap">
+                                        <a href="javascript:;" className="btn btn-xs btn-icon btn-rounded btn-flush-dark flush-soft-hover card-close">
+                                            <span className="icon" >
+                                                <span className="feather-icon" style={{ fontSize: 20 }}>
+                                                    <Mail />
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                </Card.Header>
+                            </Card>
+                        </Col>
+                        <Col sm={6}>
+                            <Card style={{ backgroundColor: '#fafafa', boxShadow: 'none', borderColor: '#e4e4e7', cursor: 'Pointer' }} className={classNames("card-refresh", { "fullscreen": maxiMize })} onClick={() => addComponentToNode({ label: 'website', id: 8, type: 'website', message: null, component_category: "Inputs" })}>
+                                <div className={classNames("refresh-container", { "la-animate": refreshCard })}>
+                                    <div className="loader-pendulums" />
+                                </div>
+                                <Card.Header className="card-header-action">
+                                    <h6>Website</h6>
+                                    <div className="card-action-wrap">
+                                        <a href="javascript:;" className="btn btn-xs btn-icon btn-rounded btn-flush-dark flush-soft-hover card-close">
+                                            <span className="icon" >
+                                                <span className="feather-icon" style={{ fontSize: 20 }}>
+                                                    <Globe />
                                                 </span>
                                             </span>
                                         </a>
